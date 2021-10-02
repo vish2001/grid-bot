@@ -126,16 +126,14 @@ def main():
                 length_to_pixel_ratio = aruco_actualperimeter/aruco_perimeter
                 #val = correct(correction,waypoint1)
                 
-                if Waypoints.get(waypoint1) != 1:
+                if Waypoints.get(waypoint1) == 0:
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1)
 
-#                 elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) != 1:
-#                     angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
-
-#                     if 100 > angle >= 75:
-#                         msg = bigright
-#                     elif 40 > angle >= 20:
-#                         msg = smolright
+                elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) == 0:
+                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
+                    #Some angle stuff to left or right
+                elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) == 0:
+                    
                 sock.sendto(msg, (IP, UDP_PORT))
         h = int(strftime("%H", localtime())) - h_ini
         m = int(strftime("%M", localtime())) - m_ini
