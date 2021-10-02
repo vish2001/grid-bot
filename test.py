@@ -113,10 +113,7 @@ def main():
     h_ini = int(strftime("%H", localtime()))
     m_ini = int(strftime("%M", localtime()))
     s_ini = int(strftime("%S", localtime()))
-    msg = '245'.encode('utf-8')
-    sock.sendto(msg, (IP, UDP_PORT))
-    msg = '255'.encode('utf-8')
-    sock.sendto(msg, (IP, UDP_PORT))
+
     while True:
         success,img = cap.read()
         ids,bboxs = findArucoMarker(img)
