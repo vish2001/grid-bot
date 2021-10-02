@@ -30,8 +30,8 @@ def getMarkerRotation(corners):
 
 #########################################3
 try:
-    camera_matrix =  [[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]]
-    dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]]
+    camera_matrix =  np.array([[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]])
+    dist_matrix =  np.array([[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]])
     found_dict_pixel_space = {}
     found_dict_camera_space = {}
     found_dict_world_space = {}
@@ -42,7 +42,7 @@ try:
     # load aruco parameters
     parameters = cv2.aruco.DetectorParameters_create()
     aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_50)
-    cap = cv2.VideoCapture("0")
+    cap = cv2.VideoCapture(0)
     while True:
         _,image = cap.read()
         #aruco-detection

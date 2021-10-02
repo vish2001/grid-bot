@@ -19,6 +19,7 @@ pixel_space ={}
 Waypoints = {waypoint1:0,waypoint2:0,waypoint3:0,waypoint4:0}
 aruco_actualperimeter = 400 #in mm
 IP = "192.168.1.15"
+UDP_PORT = 8888
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 def turn_angle(img,markers_found,waypoint):
     try:
