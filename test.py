@@ -71,22 +71,22 @@ def move_to_waypoint(img,pixel_space,length_to_pixel_ratio,waypoint,threshold=16
     else:
         msg = stop
     return msg
-def correct(waypointa,waypointb):
-    msg = forward
-    try:
-        x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
-        x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
-        val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
-        if abs(val) >2000:
-            if val>0:
-                msg = '3'.encode('utf-8')
-            else:
-                msg = '2'.encode('utf-8')
-        else:
-            msg = forward
-    except KeyError:
-        print('lol')
-    return msg
+# def correct(waypointa,waypointb):
+#     msg = forward
+#     try:
+#         x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
+#         x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
+#         val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
+#         if abs(val) >2000:
+#             if val>0:
+#                 msg = '3'.encode('utf-8')
+#             else:
+#                 msg = '2'.encode('utf-8')
+#         else:
+#             msg = forward
+#     except KeyError:
+#         print('lol')
+#     return msg
 def avg_top2corners(img,marker):
     xt = (marker[robot][0][0][0]+ marker[robot][0][1][0])*0.5
     yt = (marker[robot][0][0][1]+ marker[robot][0][1][1])*0.5
@@ -113,6 +113,10 @@ def main():
     h_ini = int(strftime("%H", localtime()))
     m_ini = int(strftime("%M", localtime()))
     s_ini = int(strftime("%S", localtime()))
+    msg = '245'.encode('utf-8')
+    sock.sendto(msg, (IP, UDP_PORT))
+    msg = '255'.encode('utf-8')
+    sock.sendto(msg, (IP, UDP_PORT))
     while True:
         success,img = cap.read()
         ids,bboxs = findArucoMarker(img)
