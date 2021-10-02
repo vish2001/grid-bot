@@ -6,6 +6,7 @@
 #define IN_4  0           // L298N in4 motors Left            GPIO0(D3)
 #include <ESP8266WiFi.h>  
 #include <WiFiUdp.h>
+#include <Servo.h>
 int speedCar1 = 245;
 int speedCar2 = 255;
 int turnSpeed = 400;
@@ -17,6 +18,7 @@ const char* ssid = "KIRNET";
 const char* password = "Buddy@123";
 unsigned int localPort = 8888;
 WiFiUDP Udp;
+Servo servo;
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 //char ReplyBuffer[] = “acknowledged”; // a string to send back
 
@@ -27,6 +29,8 @@ pinMode(IN_1, OUTPUT);
 pinMode(IN_2, OUTPUT);
 pinMode(IN_3, OUTPUT);
 pinMode(IN_4, OUTPUT);
+servo.attach(2); //D4
+servo.write(0);
 Serial.begin(115200);
 WiFi.mode(WIFI_STA);
   WiFi.begin(ssid,password);
@@ -81,6 +85,12 @@ void stopRobot(){
       digitalWrite(IN_3, LOW);
       digitalWrite(IN_4, LOW);
  }
+void dropping(){
+      servo.write(90);
+      delay(1000);
+      servo.write(0);
+      delay(1000);
+}
 
 void loop(){
   int packetSize = Udp.parsePacket();
@@ -94,6 +104,7 @@ void loop(){
       else if (msg == "s") goBack();
       else if (msg == "a") goLeft();
       else if (msg == "d") goRight();
+      else if (msg == "p") dropping();
       else if (msg == "0") speedCar1 += 10;
       else if (msg == "1") speedCar2 += 10;
       else if (msg == "2") speedCar1 += 5;
