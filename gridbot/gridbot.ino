@@ -6,9 +6,8 @@
 #define IN_4  0           // L298N in4 motors Left            GPIO0(D3)
 #include <ESP8266WiFi.h>  
 #include <WiFiUdp.h>
-#include <String>
-int speedCar1 = 245;
-int speedCar2 = 255;// 400 - 1023.
+int speedCar1 = 210;
+int speedCar2 = 255;
 int turnSpeed = 400;
 int smolDelay = 10;
 int bigDelay = 50;
@@ -84,21 +83,12 @@ void stopRobot(){
  }
 
 void loop(){
-  int count = 0;
   int packetSize = Udp.parsePacket();
   if (packetSize) {
-    
     int n = Udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
     packetBuffer[n] = 0;
     Serial.println("Contents:");
     String msg = packetBuffer;
-    if(count == 0){
-      speedCar1 = msg.toInt();
-      }
-    else if(count == 1){
-      speedCar2 = msg.toInt();
-      }
-    else{
     Serial.println(msg);
       if (msg == "w") goAhead();
       else if (msg == "s") goBack();
@@ -129,7 +119,6 @@ void loop(){
       if (speedCar2 < 100) {
         speedCar2 = 100;
       }
+      
     }
-    }
-    count++;
 }
