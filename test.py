@@ -11,7 +11,7 @@ dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523
 robot = '4'
 waypoint1 = '6'
 waypoint2 = 'right'
-waypoint3 = '1'
+waypoint3 = '9'
 correction = '7'
 forward = 'w'.encode('utf-8')
 smolright = 'd2'.encode('utf-8')
@@ -23,7 +23,7 @@ markers_found ={}
 pixel_space ={}
 Waypoints = {waypoint1:0,waypoint2:0,waypoint3:0}
 aruco_actualperimeter = 600 #in mm
-IP = "192.168.1.17" #"192.168.29.198"
+IP = "192.168.1.15" #"192.168.29.198"
 UDP_PORT = 8888
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -72,16 +72,20 @@ def move_to_waypoint(img,pixel_space,length_to_pixel_ratio,waypoint,threshold=16
         msg = stop
     return msg
 def correct(waypointa,waypointb):
-    x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
-    x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
-    val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
-    if abs(val) >2000:
-           if val>0:
-               msg = '3'.encode('utf-8')
-           else:
-               msg = '2'.encode('utf-8')
-    else:
-       msg = forward
+    msg = forward
+    try:
+        x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
+        x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
+        val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
+        if abs(val) >2000:
+            if val>0:
+                msg = '3'.encode('utf-8')
+            else:
+                msg = '2'.encode('utf-8')
+        else:
+            msg = forward
+    except KeyError:
+        print('lol')
     return msg
 def avg_top2corners(img,marker):
     xt = (marker[robot][0][0][0]+ marker[robot][0][1][0])*0.5
@@ -105,7 +109,7 @@ def turn_angle(img,markers_found,waypoint):
     return angle
 
 def main():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     h_ini = int(strftime("%H", localtime()))
     m_ini = int(strftime("%M", localtime()))
     s_ini = int(strftime("%S", localtime()))
