@@ -3,16 +3,16 @@ import numpy as np
 import cv2.aruco as aruco
 import math
 
-marker_dimension = 0.1
-worldx = 510    #889  #Values in millimeters
-worldy = 520    #508
+marker_dimension = 0.13
+worldx = 539    #889  #Values in millimeters
+worldy = 922    #508
 
 # modify these based on your enviornment settings
-robot_ID = 3
-bottom_left = 0  #31 this is the origin - positivex: towards bottom right - positivey: towards top left
-bottom_right = 10
-top_left = 1
-top_right = 11
+robot_ID = 4
+bottom_left = 7  #31 this is the origin - positivex: towards bottom right - positivey: towards top left
+bottom_right = 13
+top_left = 6
+top_right = 9
 ##########################################
 def getMarkerCenter(corners):
  px = (corners[0][0] + corners[1][0] + corners[2][0]+ corners[3][0]) * 0.25
@@ -30,8 +30,8 @@ def getMarkerRotation(corners):
 
 #########################################3
 try:
-    camera_matrix = np.array([[1466.491943359375, 0.0, 901.8966674089461], [0.0, 1439.856689453125, 534.5401928035208], [0.0, 0.0, 1.0]])
-    dist_matrix = np.array([[0.18988603367969614, -0.4769785703743122, -0.0025297149120666164, -0.017119733125341288, 0.5752866962911158]])
+    camera_matrix =  [[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]]
+    dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]]
     found_dict_pixel_space = {}
     found_dict_camera_space = {}
     found_dict_world_space = {}
@@ -42,7 +42,7 @@ try:
     # load aruco parameters
     parameters = cv2.aruco.DetectorParameters_create()
     aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_50)
-    cap = cv2.VideoCapture("http://192.168.29.181:8080/video")
+    cap = cv2.VideoCapture("0")
     while True:
         _,image = cap.read()
         #aruco-detection
@@ -81,10 +81,10 @@ try:
                 cv2.imshow('display', display)
             #Homography
             if (len(found_dict_pixel_space) >= 4):
-                zero = found_dict_pixel_space['0'][0][3]  # bottom left - 0
-                x = found_dict_pixel_space['10'][0][2]  # bottom right - 10
-                y = found_dict_pixel_space['1'][0][0]  # top left - 1
-                xy = found_dict_pixel_space['11'][0][1]  # top right - 11
+                zero = found_dict_pixel_space[bottom_left][0][3]  # bottom left - 0
+                x = found_dict_pixel_space[bottom_right][0][2]  # bottom right - 10
+                y = found_dict_pixel_space[top_left][0][0]  # top left - 1
+                xy = found_dict_pixel_space[top_right][0][1]  # top right - 11
             else:
                 continue
 
