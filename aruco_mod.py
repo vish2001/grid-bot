@@ -18,7 +18,7 @@ markers_found ={}
 pixel_space ={}
 Waypoints = {waypoint1:0,waypoint2:0,waypoint3:0,waypoint4:0}
 aruco_actualperimeter = 400 #in mm
-IP = "192.168.29.243" ;
+IP = "192.168.1.15"
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 def turn_angle(img,markers_found,waypoint):
     try:
@@ -84,7 +84,7 @@ def avg_top2corners(img,marker):
     cv2.circle(img, (int(xt), int(yt)), 5, (0, 0, 255), -1)
     return int(xt),int(yt)
 def main():
-    cap = cv2.VideoCapture("http://192.168.29.181:8080/video")
+    cap = cv2.VideoCapture(0)
     ptime = 0
     while True:
         success,img = cap.read()
@@ -135,6 +135,3 @@ def main():
         cv2.waitKey(1)
 if __name__ == "__main__":
     main()
-
-if 0 <= angle < 90:
-    while
