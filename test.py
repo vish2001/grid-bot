@@ -8,10 +8,11 @@ from time import strftime,localtime
 camera_matrix =  [[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]]
 dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]]
 
-robot = '2'
-waypoint1 = '3'
+robot = '4'
+waypoint1 = '6'
 waypoint2 = 'right'
 waypoint3 = '1'
+correction = '7'
 forward = 'w'.encode('utf-8')
 smolright = 'd2'.encode('utf-8')
 smolleft = 'a2'.encode('utf-8')
@@ -118,7 +119,7 @@ def main():
                 pixel_space[str(ids[i][0])] = (marker[1],marker[2])
                 aruco_perimeter = cv2.arcLength(bboxs[0], True)
                 length_to_pixel_ratio = aruco_actualperimeter/aruco_perimeter
-                val = correct('5',waypoint1)
+                val = correct(correction,waypoint1)
                 print(val)
                 if Waypoints.get(waypoint1) != 1:
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1)
