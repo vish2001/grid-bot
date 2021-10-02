@@ -4,7 +4,6 @@ import numpy as np
 import math
 import socket
 from time import strftime,localtime
-import dlib
 
 camera_matrix =  [[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]]
 dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]]
@@ -75,11 +74,11 @@ def correct(waypointa,waypointb):
     x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
     x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
     val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
-    if abs(val) >1000:
+    if abs(val) >2000:
            if val>0:
-               msg = smolleft
+               msg = '3'.encode('utf-8')
            else:
-               msg = smolright
+               msg = '2'.encode('utf-8')
     else:
        msg = forward
     return msg
@@ -124,13 +123,13 @@ def main():
                 if Waypoints.get(waypoint1) != 1:
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1)
 
-                elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) != 1:
-                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
+#                 elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) != 1:
+#                     angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
 
-                    if 100 > angle >= 75:
-                        msg = bigright
-                    elif 40 > angle >= 20:
-                        msg = smolright
+#                     if 100 > angle >= 75:
+#                         msg = bigright
+#                     elif 40 > angle >= 20:
+#                         msg = smolright
                 sock.sendto(msg, (IP, UDP_PORT))
         h = int(strftime("%H", localtime())) - h_ini
         m = int(strftime("%M", localtime())) - m_ini
