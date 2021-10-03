@@ -12,8 +12,8 @@ dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523
 robot = '10'
 start = '1'
 waypoint1 = '2'
-waypoint2 = 'right'
-waypoint3 = '3'
+turn = 'turn'
+waypoint2 = '3'
 end = 'drop'
 ################################
 #Bot commands
@@ -26,7 +26,7 @@ drp_pkg = 'p'.encode('utf-8')
 ################################
 markers_found ={}
 pixel_space ={}
-Waypoints = {start:0,waypoint1:0,waypoint2:0,waypoint3:0,end:0}
+Waypoints = {start:0,waypoint1:0,turn:0,waypoint3:0,end:0}
 WayVal = list(Waypoints.values())
 aruco_actualperimeter = 520 #in mm
 IP = "192.168.1.15" #IP Of the bot
@@ -116,29 +116,28 @@ def main():
                 pixel_space[str(ids[i][0])] = (marker[1],marker[2])
                 aruco_perimeter = cv2.arcLength(bboxs[0], True)
                 length_to_pixel_ratio = aruco_actualperimeter/aruco_perimeter
-                
-                
-                if WayVal == [0,0,0,0,0]:
+                 
+                if WayVal == [0,0,0,0,0]: #Bot moves to waypoint1
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1)
 
-                elif WayVal == [0,1,0,0,0]:
-                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint3)
+                elif WayVal == [0,1,0,0,0]: #Bot turns towards waypoint2
+                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
                     if 45 < angle < 100:
-                        msg = left
-                    Waypoints[waypoint2] = 1
-                elif WayVal == [0,1,1,0,0]:
-                    msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint3)
-                elif WayVal == [0,1,1,1,0]:
+                        msg = left #right
+                    Waypoints[turn] = 1
+                elif WayVal == [0,1,1,0,0]:  #Bot moves to waypoint2
+                    msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint2)
+                elif WayVal == [0,1,1,1,0]:  #Bot drops the parcel
                     msg = drp_pkg
                     Waypoints[end] = 1
-                elif WayVal == [0,1,1,1,1]:
+                elif WayVal == [0,1,1,1,1]:  #Bot moves to waypoint1
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1,command = backward)
                 elif WayVal == [0,2,1,1,1]:
                     angle = turn_angle(img, markers_found=markers_found, waypoint = start)
                     if 45 < angle < 100:
-                        msg = left
-                    Waypoints[waypoint2] = 2
-                elif WayVal == [0,2,2,1,1]:
+                        msg = left #right
+                    Waypoints[turn] = 2
+                elif WayVal == [0,2,2,1,1]:  #Bot Returns to the start point
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, start)  
                 else:
                     msg = stop
