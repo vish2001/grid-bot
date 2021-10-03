@@ -7,26 +7,33 @@ from time import strftime,localtime
 
 camera_matrix =  [[1629.8388671875, 0.0, 949.8340035468573], [0.0, 1089.8487548828125, 503.28079681846066], [0.0, 0.0, 1.0]]
 dist_matrix =  [[0.13116578339966167, -1.6157109375615122, 0.0020990123823193523, -0.0018148349228528386, 5.229738479798447]]
-
-robot = '4'
-waypoint1 = '6'
+################################
+#Aruco Ids
+robot = '10'
+start = '1'
+waypoint1 = '2'
 waypoint2 = 'right'
-waypoint3 = '9'
-correction = '7'
+waypoint3 = '3'
+end = 'drop'
+################################
+#Bot commands
 forward = 'w'.encode('utf-8')
-smolright = 'd2'.encode('utf-8')
-smolleft = 'a2'.encode('utf-8')
-bigright = 'd1'.encode('utf-8')
-bigleft = 'a1'.encode('utf-8')
+backward = 's'.encode('utf-8')
+left = 'a'.encode('utf-8')
+right = 'd'.encode('utf-8')
 stop = 'f'.encode('utf-8')
+drp_pkg = 'p'.encode('utf-8')
+################################
 markers_found ={}
 pixel_space ={}
-Waypoints = {waypoint1:0,waypoint2:0,waypoint3:0}
+Waypoints = {start:0,waypoint1:0,waypoint2:0,waypoint3:0,end:0}
+WayVal = list(Waypoints.values())
 aruco_actualperimeter = 520 #in mm
-IP = "192.168.1.15" #"192.168.29.198"
-UDP_PORT = 8888
+IP = "192.168.1.15" #IP Of the bot
+UDP_PORT = 8888 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+#########################################################################################
+#Functions
 def findArucoMarker(img,markerSize=5,totalMarkers=250,draw=True):
     imgGray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     key = getattr(aruco,f'DICT_{markerSize}X{markerSize}_{totalMarkers}')
@@ -58,35 +65,20 @@ def length_bw_aruco(img,robotid,waypoint):
     xc = (x1+x2)/2
     yc = (y1+y2)/2
     return distance,int(xc),int(yc)
-def move_to_waypoint(img,pixel_space,length_to_pixel_ratio,waypoint,threshold=160):
+def move_to_waypoint(img,pixel_space,length_to_pixel_ratio,waypoint,threshold=160,command = forward):
     if robot in pixel_space and waypoint in pixel_space:
         distance,xc,yc = length_bw_aruco(img,robot,waypoint)
         cntrl = distance*length_to_pixel_ratio
         print("cntrl",cntrl)
         if cntrl >= threshold:
-            msg = forward
+            msg = command
         else:
             msg = stop
             Waypoints[waypoint] = 1
     else:
         msg = stop
     return msg
-# def correct(waypointa,waypointb):
-#     msg = forward
-#     try:
-#         x1,y1 = (pixel_space[waypointa][0],pixel_space[waypointa][1])
-#         x2,y2 = (pixel_space[waypointb][0], pixel_space[waypointb][1])
-#         val = (y2-y1)*((pixel_space[robot][0]-x1)/(x2-x1)) - (pixel_space[robot][1]-y1)
-#         if abs(val) >2000:
-#             if val>0:
-#                 msg = '3'.encode('utf-8')
-#             else:
-#                 msg = '2'.encode('utf-8')
-#         else:
-#             msg = forward
-#     except KeyError:
-#         print('lol')
-#     return msg
+
 def avg_top2corners(img,marker):
     xt = (marker[robot][0][0][0]+ marker[robot][0][1][0])*0.5
     yt = (marker[robot][0][0][1]+ marker[robot][0][1][1])*0.5
@@ -124,17 +116,35 @@ def main():
                 pixel_space[str(ids[i][0])] = (marker[1],marker[2])
                 aruco_perimeter = cv2.arcLength(bboxs[0], True)
                 length_to_pixel_ratio = aruco_actualperimeter/aruco_perimeter
-                #val = correct(correction,waypoint1)
                 
-                if Waypoints.get(waypoint1) == 0:
+                
+                if WayVal == [0,0,0,0,0]:
                     msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1)
 
-                elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) == 0:
-                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint2)
-                    #Some angle stuff to left or right
-                elif Waypoints.get(waypoint1) == 1 and Waypoints.get(waypoint2) == 0:
-                    
+                elif WayVal == [0,1,0,0,0]:
+                    angle = turn_angle(img, markers_found=markers_found, waypoint = waypoint3)
+                    if 45 < angle < 100:
+                        msg = left
+                    Waypoints[waypoint2] = 1
+                elif WayVal == [0,1,1,0,0]:
+                    msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint3)
+                elif WayVal == [0,1,1,1,0]:
+                    msg = drp_pkg
+                    Waypoints[end] = 1
+                elif WayVal == [0,1,1,1,1]:
+                    msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, waypoint1,command = backward)
+                elif WayVal == [0,2,1,1,1]:
+                    angle = turn_angle(img, markers_found=markers_found, waypoint = start)
+                    if 45 < angle < 100:
+                        msg = left
+                    Waypoints[waypoint2] = 2
+                elif WayVal == [0,2,2,1,1]:
+                    msg = move_to_waypoint(img, pixel_space, length_to_pixel_ratio, start)  
+                else:
+                    msg = stop
                 sock.sendto(msg, (IP, UDP_PORT))
+                break
+            break
         h = int(strftime("%H", localtime())) - h_ini
         m = int(strftime("%M", localtime())) - m_ini
         s = int(strftime("%S", localtime())) - s_ini
